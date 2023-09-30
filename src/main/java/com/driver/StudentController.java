@@ -18,37 +18,64 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("students")
 public class StudentController {
-
+    @Autowired
+  public StudentService s;
     @PostMapping("/add-student")
     public ResponseEntity<String> addStudent(@RequestBody Student student){
+        Student st=student;
+        boolean ans=s.addStudent(student);
+        if(ans){
+            return new ResponseEntity<>("New student added successfully", HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<>("New student Not added successfully", HttpStatus.BAD_REQUEST);
+        }
 
-        return new ResponseEntity<>("New student added successfully", HttpStatus.CREATED);
     }
 
     @PostMapping("/add-teacher")
     public ResponseEntity<String> addTeacher(@RequestBody Teacher teacher){
-
-        return new ResponseEntity<>("New teacher added successfully", HttpStatus.CREATED);
+        boolean ans=s.addTeacher(teacher);
+        if(ans){
+            return new ResponseEntity<>("New teacher added successfully", HttpStatus.CREATED);
+        }else{
+            return new ResponseEntity<>("New teacher Not added successfully", HttpStatus.BAD_REQUEST);
+        }
+        //return new ResponseEntity<>("New teacher added successfully", HttpStatus.CREATED);
     }
 
     @PutMapping("/add-student-teacher-pair")
     public ResponseEntity<String> addStudentTeacherPair(@RequestParam String student, @RequestParam String teacher){
-
-        return new ResponseEntity<>("New student-teacher pair added successfully", HttpStatus.CREATED);
+        boolean ans=s.addPair(student,teacher);
+        if(ans){
+            return new ResponseEntity<>("New student-teacher pair added successfully", HttpStatus.CREATED);
+        }else
+        return new ResponseEntity<>("New student-teacher pair Not added successfully", HttpStatus.BAD_GATEWAY);
     }
 
     @GetMapping("/get-student-by-name/{name}")
     public ResponseEntity<Student> getStudentByName(@PathVariable String name){
         Student student = null; // Assign student by calling service layer method
+        Student stud=s.checkStudent(name);
+        if(stud==null){
+            return new ResponseEntity<>(student, HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(stud, HttpStatus.CREATED);
+        }
+         //  return new ResponseEntity<Student>(null);
 
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
+        //return new ResponseEntity<>(student, HttpStatus.CREATED);
     }
 
     @GetMapping("/get-teacher-by-name/{name}")
     public ResponseEntity<Teacher> getTeacherByName(@PathVariable String name){
         Teacher teacher = null; // Assign student by calling service layer method
+        Teacher teacher1=s.checkTeacher(name);
+        if(teacher1==null){
+            return new ResponseEntity<>(teacher, HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(teacher1, HttpStatus.CREATED);
+        }
 
-        return new ResponseEntity<>(teacher, HttpStatus.CREATED);
     }
 
     @GetMapping("/get-students-by-teacher-name/{teacher}")
